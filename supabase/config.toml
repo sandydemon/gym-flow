@@ -1,0 +1,7 @@
+project_id = "hvvbtitlslkzrgjdutpe"
+
+[functions.create-gym-user]
+verify_jwt = false
+
+[functions.invite-admin]
+verify_jwt = false

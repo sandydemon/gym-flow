@@ -1,0 +1,204 @@
+@import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700;800&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+@layer base {
+  :root {
+    --background: 220 20% 7%;
+    --foreground: 210 40% 96%;
+
+    --card: 220 20% 10%;
+    --card-foreground: 210 40% 96%;
+
+    --popover: 220 20% 12%;
+    --popover-foreground: 210 40% 96%;
+
+    --primary: 166 76% 58%;
+    --primary-foreground: 220 20% 7%;
+
+    --secondary: 220 18% 16%;
+    --secondary-foreground: 210 40% 96%;
+
+    --muted: 220 15% 20%;
+    --muted-foreground: 215 20% 55%;
+
+    --accent: 220 18% 14%;
+    --accent-foreground: 210 40% 96%;
+
+    --destructive: 0 72% 50%;
+    --destructive-foreground: 0 85% 97%;
+
+    --border: 220 15% 18%;
+    --input: 220 15% 18%;
+    --ring: 166 76% 58%;
+
+    --radius: 0.75rem;
+
+    --success: 160 84% 39%;
+    --success-foreground: 0 0% 100%;
+    --warning: 38 92% 50%;
+    --warning-foreground: 0 0% 100%;
+
+    --sidebar-background: 220 25% 6%;
+    --sidebar-foreground: 210 40% 96%;
+    --sidebar-primary: 166 76% 58%;
+    --sidebar-primary-foreground: 220 20% 7%;
+    --sidebar-accent: 220 18% 14%;
+    --sidebar-accent-foreground: 210 40% 96%;
+    --sidebar-border: 220 15% 18%;
+    --sidebar-ring: 166 76% 58%;
+    --chart-1: 166 76% 58%;
+    --chart-2: 270 60% 65%;
+    --chart-3: 200 80% 60%;
+    --chart-4: 330 70% 60%;
+    --chart-5: 45 90% 60%;
+    --sidebar: 220 20% 10%;
+
+    --gradient-start: 166 76% 58%;
+    --gradient-end: 270 60% 65%;
+
+    --shadow-2xs: 0 1px 3px 0px hsl(0 0% 0% / 0.15);
+    --shadow-xs: 0 1px 3px 0px hsl(0 0% 0% / 0.2);
+    --shadow-sm: 0 2px 4px 0px hsl(0 0% 0% / 0.2), 0 1px 2px -1px hsl(0 0% 0% / 0.15);
+    --shadow: 0 4px 6px -1px hsl(0 0% 0% / 0.25), 0 2px 4px -2px hsl(0 0% 0% / 0.15);
+    --shadow-md: 0 6px 10px -1px hsl(0 0% 0% / 0.25), 0 4px 6px -2px hsl(0 0% 0% / 0.15);
+    --shadow-lg: 0 10px 15px -3px hsl(0 0% 0% / 0.3), 0 4px 6px -4px hsl(0 0% 0% / 0.2);
+    --shadow-xl: 0 20px 25px -5px hsl(0 0% 0% / 0.35), 0 8px 10px -6px hsl(0 0% 0% / 0.2);
+    --shadow-2xl: 0 25px 50px -12px hsl(0 0% 0% / 0.5);
+    --tracking-normal: 0em;
+    --spacing: 0.25rem;
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+
+  body {
+    @apply bg-background text-foreground antialiased;
+    font-family: 'DM Sans', sans-serif;
+  }
+
+  /* Custom scrollbar */
+  ::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+  }
+  ::-webkit-scrollbar-track {
+    background: transparent;
+  }
+  ::-webkit-scrollbar-thumb {
+    background: hsl(220, 15%, 22%);
+    border-radius: 10px;
+  }
+  ::-webkit-scrollbar-thumb:hover {
+    background: hsl(220, 15%, 30%);
+  }
+}
+
+@layer utilities {
+  .stat-card {
+    @apply bg-card border border-border rounded-xl p-6 shadow-md;
+  }
+
+  .stat-value {
+    @apply text-3xl font-bold text-foreground;
+  }
+
+  .stat-label {
+    @apply text-sm text-muted-foreground font-medium;
+  }
+
+  .gradient-text {
+    @apply bg-clip-text text-transparent bg-gradient-to-r from-[hsl(166,76%,58%)] to-[hsl(270,60%,65%)];
+  }
+
+  .gradient-border {
+    @apply border border-transparent;
+    background-clip: padding-box;
+    position: relative;
+  }
+
+  .gradient-bg {
+    @apply bg-gradient-to-br from-[hsl(166,76%,58%,0.1)] to-[hsl(270,60%,65%,0.1)];
+  }
+
+  .glass-card {
+    @apply bg-card/80 backdrop-blur-xl border border-border/50 rounded-2xl shadow-lg;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+  }
+
+  .glass-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 30px -8px hsl(166 76% 58% / 0.12), 0 4px 12px -4px hsl(0 0% 0% / 0.3);
+  }
+
+  .glow-primary {
+    box-shadow: 0 0 20px -5px hsl(166 76% 58% / 0.3);
+  }
+
+  .glow-success {
+    box-shadow: 0 0 20px -5px hsl(160 84% 39% / 0.3);
+  }
+
+  .glow-warning {
+    box-shadow: 0 0 20px -5px hsl(38 92% 50% / 0.3);
+  }
+
+  .page-header {
+    @apply flex items-center gap-3 mb-1;
+  }
+
+  .page-header-icon {
+    @apply flex h-11 w-11 items-center justify-center rounded-2xl bg-gradient-to-br from-[hsl(166,76%,58%)] to-[hsl(270,60%,65%)] shadow-lg shadow-primary/20;
+  }
+
+  /* Animated gradient border */
+  .animated-border {
+    position: relative;
+    overflow: hidden;
+  }
+  .animated-border::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 200%;
+    height: 2px;
+    background: linear-gradient(90deg, transparent, hsl(166, 76%, 58%), hsl(270, 60%, 65%), transparent);
+    animation: shimmer 3s ease-in-out infinite;
+  }
+
+  @keyframes shimmer {
+    0% { left: -100%; }
+    100% { left: 100%; }
+  }
+
+  @keyframes fadeInUp {
+    from { opacity: 0; transform: translateY(12px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  .animate-fade-in-up {
+    animation: fadeInUp 0.4s ease-out forwards;
+  }
+
+  .animate-fade-in-up-delay-1 {
+    animation: fadeInUp 0.4s ease-out 0.1s forwards;
+    opacity: 0;
+  }
+  .animate-fade-in-up-delay-2 {
+    animation: fadeInUp 0.4s ease-out 0.2s forwards;
+    opacity: 0;
+  }
+  .animate-fade-in-up-delay-3 {
+    animation: fadeInUp 0.4s ease-out 0.3s forwards;
+    opacity: 0;
+  }
+  .animate-fade-in-up-delay-4 {
+    animation: fadeInUp 0.4s ease-out 0.4s forwards;
+    opacity: 0;
+  }
+}
