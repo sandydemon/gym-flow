@@ -134,7 +134,7 @@ export default function PaidTraining() {
       const { data, error } = await supabase
         .from('weight_progress')
         .select('*')
-        .eq('paid_training_member_id', selectedMemberId!)
+        .eq('member_id', selectedMemberId!)
         .order('recorded_at', { ascending: false });
       if (error) throw error;
       return data;
@@ -149,7 +149,7 @@ export default function PaidTraining() {
       const { data, error } = await supabase
         .from('progress_photos')
         .select('*')
-        .eq('paid_training_member_id', selectedMemberId!)
+        .eq('member_id', selectedMemberId!)
         .order('created_at', { ascending: false });
       if (error) throw error;
       return data;
@@ -164,7 +164,7 @@ export default function PaidTraining() {
       const { data, error } = await supabase
         .from('body_measurements')
         .select('*')
-        .eq('paid_training_member_id', selectedMemberId!)
+        .eq('member_id', selectedMemberId!)
         .order('recorded_at', { ascending: false });
       if (error) throw error;
       return data;
@@ -176,7 +176,7 @@ export default function PaidTraining() {
   const addMeasurement = useMutation({
     mutationFn: async () => {
       const entry: any = {
-        paid_training_member_id: selectedMemberId!,
+        member_id: selectedMemberId!,
         user_id: gymOwnerId!,
       };
       const fields = ['chest', 'waist', 'hips', 'biceps', 'shoulders', 'thighs', 'calves', 'neck'] as const;
@@ -297,7 +297,7 @@ export default function PaidTraining() {
       .getPublicUrl(filePath);
 
     const { error } = await supabase.from('progress_photos').insert({
-      paid_training_member_id: selectedMemberId,
+      member_id: selectedMemberId,
       user_id: gymOwnerId!,
       photo_url: urlData.publicUrl,
       label: photoLabel || null,
