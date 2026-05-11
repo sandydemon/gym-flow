@@ -104,7 +104,7 @@ export default function PaidTraining() {
     queryFn: async () => {
       const { data, error } = await supabase
         .from('paid_training_members')
-        .select('*, members(full_name, phone)')
+        .select('id, member_id, user_id, height, target, trainer_id, created_at, members(full_name, phone)')
         .eq('user_id', gymOwnerId!)
         .order('created_at', { ascending: false });
       if (error) throw error;
@@ -622,7 +622,6 @@ export default function PaidTraining() {
             </Card>
           </div>
 
-          console.log('DEBUG member_id:', (selectedPaidMember as any)?.member_id);
           <WorkoutPlanCard paidTrainingMemberId={(selectedPaidMember as any).member_id} />
 
           <Card>
