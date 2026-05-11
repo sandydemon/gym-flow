@@ -116,56 +116,57 @@ export default function PaidTraining() {
   const paidMemberIds = paidMembers.map((p: any) => p.member_id);
   const availableMembers = allMembers.filter((m) => !paidMemberIds.includes(m.id));
   const selectedPaidMember = paidMembers.find((p: any) => p.id === selectedMemberId);
+  const actualMemberId = (selectedPaidMember as any)?.member_id ?? null;
 
-  // Weight history - using member_id
+  // Weight history for selected member
   const { data: weightHistory = [] } = useQuery<any[]>({
-    queryKey: ['weight-progress', selectedMemberId],
+    queryKey: ['weight-progress', actualMemberId],
     queryFn: async () => {
       const { data, error } = await supabase
         .from('weight_progress')
         .select('*')
-        .eq('member_id', selectedMemberId!)
+        .eq('member_id', actualMemberId!)
         .order('recorded_at', { ascending: false });
       if (error) throw error;
       return data ?? [];
     },
-    enabled: !!selectedMemberId,
+    enabled: !!actualMemberId,
   });
 
-  // Photos - using member_id
+  // Photos for selected member
   const { data: photos = [] } = useQuery<any[]>({
-    queryKey: ['progress-photos', selectedMemberId],
+    queryKey: ['progress-photos', actualMemberId],
     queryFn: async () => {
       const { data, error } = await supabase
         .from('progress_photos')
         .select('*')
-        .eq('member_id', selectedMemberId!)
+        .eq('member_id', actualMemberId!)
         .order('created_at', { ascending: false });
       if (error) throw error;
       return data ?? [];
     },
-    enabled: !!selectedMemberId,
+    enabled: !!actualMemberId,
   });
 
-  // Body measurements - using member_id
+  // Body measurements for selected member
   const { data: measurements = [] } = useQuery<any[]>({
-    queryKey: ['body-measurements', selectedMemberId],
+    queryKey: ['body-measurements', actualMemberId],
     queryFn: async () => {
       const { data, error } = await supabase
         .from('body_measurements')
         .select('*')
-        .eq('member_id', selectedMemberId!)
+        .eq('member_id', actualMemberId!)
         .order('recorded_at', { ascending: false });
       if (error) throw error;
       return data ?? [];
     },
-    enabled: !!selectedMemberId,
+    enabled: !!actualMemberId,
   });
 
   const addMeasurement = useMutation({
     mutationFn: async () => {
       const entry: any = {
-        member_id: selectedMemberId!,
+        member_id: actualMemberId!,
         user_id: gymOwnerId!,
       };
       const fields = ['chest', 'waist', 'hips', 'biceps', 'shoulders', 'thighs', 'calves', 'neck'] as const;
@@ -174,7 +175,7 @@ export default function PaidTraining() {
       if (error) throw error;
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['body-measurements', selectedMemberId] });
+      queryClient.invalidateQueries({ queryKey: ['body-measurements', actualMemberId] });
       setMeasurementForm({ chest: '', waist: '', hips: '', biceps: '', shoulders: '', thighs: '', calves: '', neck: '' });
       setAddMeasurementOpen(false);
       toast.success('Measurement recorded');
@@ -188,7 +189,7 @@ export default function PaidTraining() {
       if (error) throw error;
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['body-measurements', selectedMemberId] });
+      queryClient.invalidateQueries({ queryKey: ['body-measurements', actualMemberId] });
       toast.success('Measurement deleted');
     },
     onError: () => toast.error('Failed to delete'),
@@ -250,14 +251,14 @@ export default function PaidTraining() {
   const addWeight = useMutation({
     mutationFn: async () => {
       const { error } = await supabase.from('weight_progress').insert({
-        member_id: selectedMemberId!,
+        member_id: actualMemberId!,
         user_id: gymOwnerId!,
         weight: Number(newWeight),
       } as any);
       if (error) throw error;
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['weight-progress', selectedMemberId] });
+      queryClient.invalidateQueries({ queryKey: ['weight-progress', actualMemberId] });
       setNewWeight('');
       toast.success('Weight recorded');
     },
@@ -267,10 +268,10 @@ export default function PaidTraining() {
   // Upload photo - using member_id
   const uploadPhoto = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
-    if (!file || !selectedMemberId) return;
+    if (!file || !actualMemberId) return;
 
     const ext = file.name.split('.').pop();
-    const filePath = `${user!.id}/${selectedMemberId}/${Date.now()}.${ext}`;
+    const filePath = `${user!.id}/${actualMemberId}/${Date.now()}.${ext}`;
 
     const { error: uploadError } = await supabase.storage
       .from('progress-photos')
@@ -282,7 +283,7 @@ export default function PaidTraining() {
       .getPublicUrl(filePath);
 
     const { error } = await supabase.from('progress_photos').insert({
-      member_id: selectedMemberId,
+      member_id: actualMemberId,
       user_id: gymOwnerId!,
       photo_url: urlData.publicUrl,
       label: photoLabel || null,
@@ -316,7 +317,7 @@ export default function PaidTraining() {
       const { error } = await supabase
         .from('paid_training_members')
         .update(updates)
-        .eq('id', selectedMemberId!);
+        .eq('id', actualMemberId!);
       if (error) throw error;
     },
     onSuccess: () => {
@@ -869,7 +870,7 @@ export default function PaidTraining() {
                     size="sm"
                     disabled={removeMember.isPending}
                     onClick={() => removeMember.mutate({
-                      id: selectedMemberId!,
+                      id: actualMemberId!,
                       updateFee: removeForm.updateFee,
                       newFee: removeForm.newFee,
                       memberId: (selectedPaidMember as any).member_id,
