@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/useAuth';
+import { useGymOwnerId } from '@/hooks/useGymOwnerId';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -29,6 +30,7 @@ interface Props {
 
 export default function WorkoutPlanCard({ paidTrainingMemberId }: Props) {
   const { user } = useAuth();
+  const gymOwnerId = useGymOwnerId();
   const qc = useQueryClient();
   const [editDay, setEditDay] = useState<string | null>(null);
   const [form, setForm] = useState<{ body_parts: string[]; cardio: string; notes: string }>({
@@ -56,7 +58,7 @@ export default function WorkoutPlanCard({ paidTrainingMemberId }: Props) {
       const existing = planByDay(editDay);
       const payload: any = {
         paid_training_member_id: paidTrainingMemberId,
-        user_id: user!.id,
+        user_id: gymOwnerId!,
         day_of_week: editDay,
         body_parts: form.body_parts,
         cardio: form.cardio === 'None' ? null : form.cardio,
