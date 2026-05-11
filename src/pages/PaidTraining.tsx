@@ -622,6 +622,7 @@ export default function PaidTraining() {
             </Card>
           </div>
 
+          console.log('DEBUG member_id:', (selectedPaidMember as any)?.member_id);
           <WorkoutPlanCard paidTrainingMemberId={(selectedPaidMember as any).member_id} />
 
           <Card>
