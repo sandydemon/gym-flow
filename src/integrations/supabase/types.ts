@@ -103,7 +103,7 @@ export type Database = {
           hips: number | null
           id: string
           neck: number | null
-          paid_training_member_id: string
+          member_id: string
           recorded_at: string
           shoulders: number | null
           thighs: number | null
@@ -118,7 +118,7 @@ export type Database = {
           hips?: number | null
           id?: string
           neck?: number | null
-          paid_training_member_id: string
+          member_id: string
           recorded_at?: string
           shoulders?: number | null
           thighs?: number | null
@@ -133,7 +133,7 @@ export type Database = {
           hips?: number | null
           id?: string
           neck?: number | null
-          paid_training_member_id?: string
+          member_id?: string
           recorded_at?: string
           shoulders?: number | null
           thighs?: number | null
@@ -142,8 +142,8 @@ export type Database = {
         }
         Relationships: [
           {
-            foreignKeyName: "body_measurements_paid_training_member_id_fkey"
-            columns: ["paid_training_member_id"]
+            foreignKeyName: "body_measurements_member_id_fkey"
+            columns: ["member_id"]
             isOneToOne: false
             referencedRelation: "paid_training_members"
             referencedColumns: ["id"]
@@ -494,7 +494,7 @@ export type Database = {
         Row: {
           id: string
           label: string | null
-          paid_training_member_id: string
+          member_id: string
           photo_url: string
           uploaded_at: string
           user_id: string
@@ -502,7 +502,7 @@ export type Database = {
         Insert: {
           id?: string
           label?: string | null
-          paid_training_member_id: string
+          member_id: string
           photo_url: string
           uploaded_at?: string
           user_id: string
@@ -510,15 +510,15 @@ export type Database = {
         Update: {
           id?: string
           label?: string | null
-          paid_training_member_id?: string
+          member_id?: string
           photo_url?: string
           uploaded_at?: string
           user_id?: string
         }
         Relationships: [
           {
-            foreignKeyName: "progress_photos_paid_training_member_id_fkey"
-            columns: ["paid_training_member_id"]
+            foreignKeyName: "progress_photos_member_id_fkey"
+            columns: ["member_id"]
             isOneToOne: false
             referencedRelation: "paid_training_members"
             referencedColumns: ["id"]
@@ -752,7 +752,7 @@ export type Database = {
         Row: {
           created_at: string
           id: string
-          paid_training_member_id: string
+          member_id: string
           recorded_at: string
           user_id: string
           weight: number
@@ -760,7 +760,7 @@ export type Database = {
         Insert: {
           created_at?: string
           id?: string
-          paid_training_member_id: string
+          member_id: string
           recorded_at?: string
           user_id: string
           weight: number
@@ -768,15 +768,15 @@ export type Database = {
         Update: {
           created_at?: string
           id?: string
-          paid_training_member_id?: string
+          member_id?: string
           recorded_at?: string
           user_id?: string
           weight?: number
         }
         Relationships: [
           {
-            foreignKeyName: "weight_progress_paid_training_member_id_fkey"
-            columns: ["paid_training_member_id"]
+            foreignKeyName: "weight_progress_member_id_fkey"
+            columns: ["member_id"]
             isOneToOne: false
             referencedRelation: "paid_training_members"
             referencedColumns: ["id"]
@@ -791,7 +791,7 @@ export type Database = {
           day_of_week: string
           id: string
           notes: string | null
-          paid_training_member_id: string
+          member_id: string
           updated_at: string
           user_id: string
         }
@@ -802,7 +802,7 @@ export type Database = {
           day_of_week: string
           id?: string
           notes?: string | null
-          paid_training_member_id: string
+          member_id: string
           updated_at?: string
           user_id: string
         }
@@ -813,7 +813,7 @@ export type Database = {
           day_of_week?: string
           id?: string
           notes?: string | null
-          paid_training_member_id?: string
+          member_id?: string
           updated_at?: string
           user_id?: string
         }
