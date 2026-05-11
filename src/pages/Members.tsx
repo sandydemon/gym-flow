@@ -234,7 +234,19 @@ export default function Members() {
     .select()
     .single();
 
-  if (error) throw error;
+  if (error) {
+    if (error.code === '23505') {
+      // Duplicate entry — show friendly message
+      toast({
+        title: 'Member Already Exists',
+        description: 'A member with this phone number already exists.',
+        variant: 'destructive',
+      });
+      setIsSubmitting(false);
+      return;
+    }
+    throw error;
+  }
 
   // Auto-create current month fee as Pending
   if (newMember?.id) {
