@@ -57,7 +57,7 @@ export default function WorkoutPlanCard({ paidTrainingMemberId }: Props) {
       if (!editDay) return;
       const existing = planByDay(editDay);
       const payload: any = {
-        member_id: paidTrainingMemberId,
+        paid_training_member_id: paidTrainingMemberId,
         user_id: gymOwnerId!,
         day_of_week: editDay,
         body_parts: form.body_parts,
@@ -66,7 +66,7 @@ export default function WorkoutPlanCard({ paidTrainingMemberId }: Props) {
       };
       const { error } = await supabase
   .from('workout_plans')
-  .upsert(payload, { onConflict: 'member_id,day_of_week' });
+  .upsert(payload as any, { onConflict: 'paid_training_member_id,day_of_week' });
 if (error) throw error;
     },
     onSuccess: () => {
