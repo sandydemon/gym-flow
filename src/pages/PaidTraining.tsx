@@ -265,7 +265,7 @@ export default function PaidTraining() {
   const addWeight = useMutation({
     mutationFn: async () => {
       const { error } = await supabase.from('weight_progress').insert({
-        paid_training_member_id: selectedMemberId!,
+        member_id: selectedMemberId!,
         user_id: gymOwnerId!,
         weight: Number(newWeight),
       });
