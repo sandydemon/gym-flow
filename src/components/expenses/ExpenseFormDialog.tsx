@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Switch } from '@/components/ui/switch';
 import { Plus } from 'lucide-react';
@@ -52,7 +52,12 @@ export default function ExpenseFormDialog({ open, onOpenChange, initial, isEditi
         </DialogTrigger>
       )}
       <DialogContent className="border-border/50 bg-card/95 shadow-lg backdrop-blur-xl sm:max-w-lg">
-        <DialogHeader><DialogTitle>{isEditing ? 'Edit Expense' : 'Add Expense'}</DialogTitle></DialogHeader>
+        <DialogHeader>
+          <DialogTitle>{isEditing ? 'Edit Expense' : 'Add Expense'}</DialogTitle>
+          <DialogDescription className="sr-only">
+            {isEditing ? 'Update existing expense details' : 'Record new expense entry'}
+          </DialogDescription>
+        </DialogHeader>
         <div className="space-y-4">
           <div>
             <Label>Category</Label>

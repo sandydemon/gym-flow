@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/useAuth';
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -161,6 +161,9 @@ export default function StaffSalaryDialog({ open, onOpenChange, staffId, staffNa
           <DialogTitle className="flex items-center gap-2">
             <Wallet className="h-5 w-5" /> Salary — {staffName}
           </DialogTitle>
+          <DialogDescription className="sr-only">
+            Manage salary payments, advances, and payment history
+          </DialogDescription>
         </DialogHeader>
 
         <div className="grid grid-cols-2 gap-3 mb-2">

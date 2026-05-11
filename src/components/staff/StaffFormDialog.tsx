@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Plus } from 'lucide-react';
 import { format } from 'date-fns';
@@ -51,7 +51,12 @@ export default function StaffFormDialog({ open, onOpenChange, initial, isEditing
         </DialogTrigger>
       )}
       <DialogContent className="border-border/50 bg-card/95 shadow-lg backdrop-blur-xl sm:max-w-lg">
-        <DialogHeader><DialogTitle>{isEditing ? 'Edit Staff' : 'Add Staff'}</DialogTitle></DialogHeader>
+        <DialogHeader>
+          <DialogTitle>{isEditing ? 'Edit Staff' : 'Add Staff'}</DialogTitle>
+          <DialogDescription className="sr-only">
+            {isEditing ? 'Update existing staff information' : 'Add new staff member to gym'}
+          </DialogDescription>
+        </DialogHeader>
         <div className="space-y-4">
           <div><Label>Full Name</Label><Input value={form.full_name} onChange={e => setForm(f => ({ ...f, full_name: e.target.value }))} /></div>
           <div><Label>Phone</Label><Input value={form.phone} onChange={e => setForm(f => ({ ...f, phone: e.target.value }))} /></div>

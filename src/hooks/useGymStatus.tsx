@@ -101,6 +101,7 @@ export function useGymStatus() {
     }
 
     let channel: ReturnType<typeof supabase.channel> | null = null;
+    let pollingInterval: NodeJS.Timeout | null = null;
 
     const initializeAndSubscribe = async () => {
       // Always do a fresh check from database on mount
@@ -145,7 +146,15 @@ export function useGymStatus() {
               }
             }
           )
-          .subscribe();
+          .subscribe((status) => {
+            if (status === 'CHANNEL_ERROR' || status === 'TIMED_OUT') {
+              console.log('WebSocket subscription failed, falling back to polling');
+              // Fallback to polling every 30 seconds
+              pollingInterval = setInterval(() => {
+                checkGymStatusFresh();
+              }, 30000);
+            }
+          });
       }
     };
 
@@ -154,6 +163,9 @@ export function useGymStatus() {
     return () => {
       if (channel) {
         supabase.removeChannel(channel);
+      }
+      if (pollingInterval) {
+        clearInterval(pollingInterval);
       }
     };
   }, [user, checkGymStatusFresh, handleInactiveGym]);

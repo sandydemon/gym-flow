@@ -9,7 +9,7 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { Label } from '@/components/ui/label';
 import {
   Search, UserPlus, ArrowLeft, Plus, Trash2, Camera, Ruler, Target, TrendingUp, Image as ImageIcon, Move, Download, UserCog,
@@ -527,7 +527,7 @@ export default function PaidTraining() {
                     <Button variant="link" size="sm" className="text-xs p-0 h-auto">Edit</Button>
                   </DialogTrigger>
                   <DialogContent>
-                    <DialogHeader><DialogTitle>Update Height</DialogTitle></DialogHeader>
+                    <DialogHeader><DialogTitle>Update Height</DialogTitle><DialogDescription className="sr-only">Edit member height in feet and inches</DialogDescription></DialogHeader>
                     <div className="space-y-3">
                       <Label className="text-sm">Feet & Inches</Label>
                       <div className="grid grid-cols-2 gap-2">
@@ -586,7 +586,7 @@ export default function PaidTraining() {
                     <Button variant="link" size="sm" className="text-xs p-0 h-auto">Edit</Button>
                   </DialogTrigger>
                   <DialogContent>
-                    <DialogHeader><DialogTitle>Update Target</DialogTitle></DialogHeader>
+                    <DialogHeader><DialogTitle>Update Target</DialogTitle><DialogDescription className="sr-only">Change member fitness target</DialogDescription></DialogHeader>
                     <Select
                       defaultValue={(selectedPaidMember as any).target}
                       onValueChange={(val) => updateMember.mutate({ target: val })}
@@ -626,7 +626,7 @@ export default function PaidTraining() {
                     </Button>
                   </DialogTrigger>
                   <DialogContent>
-                    <DialogHeader><DialogTitle>Assign Trainer</DialogTitle></DialogHeader>
+                    <DialogHeader><DialogTitle>Assign Trainer</DialogTitle><DialogDescription className="sr-only">Assign or change trainer for this member</DialogDescription></DialogHeader>
                     <Select
                       defaultValue={(selectedPaidMember as any).trainer_id || 'none'}
                       onValueChange={(val) => {
@@ -711,7 +711,7 @@ export default function PaidTraining() {
                   </Button>
                 </DialogTrigger>
                 <DialogContent className="max-w-md">
-                  <DialogHeader><DialogTitle>Add Body Measurements (inches)</DialogTitle></DialogHeader>
+                  <DialogHeader><DialogTitle>Add Body Measurements (inches)</DialogTitle><DialogDescription className="sr-only">Record body measurements in inches</DialogDescription></DialogHeader>
                   <div className="grid grid-cols-2 gap-3">
                     {(['chest', 'waist', 'hips', 'biceps', 'shoulders', 'thighs', 'calves', 'neck'] as const).map(field => (
                       <div key={field}>
@@ -844,6 +844,7 @@ export default function PaidTraining() {
               <DialogContent className="max-w-3xl p-2">
                 <DialogHeader>
                   <DialogTitle className="text-sm">{lightboxPhoto.label}</DialogTitle>
+                  <DialogDescription className="sr-only">View progress photo in full size</DialogDescription>
                 </DialogHeader>
                 <img
                   src={lightboxPhoto.url}
@@ -862,7 +863,7 @@ export default function PaidTraining() {
               </Button>
             </DialogTrigger>
             <DialogContent>
-              <DialogHeader><DialogTitle>Remove from Paid Training</DialogTitle></DialogHeader>
+              <DialogHeader><DialogTitle>Remove from Paid Training</DialogTitle><DialogDescription className="sr-only">Remove member from paid training program</DialogDescription></DialogHeader>
               <div className="space-y-4">
                 <p className="text-sm text-muted-foreground">
                   Kya aap <span className="font-semibold text-foreground">{memberData?.full_name}</span> ko paid training se remove karna chahte hain?
@@ -937,7 +938,7 @@ export default function PaidTraining() {
               </Button>
             </DialogTrigger>
             <DialogContent>
-              <DialogHeader><DialogTitle>Add to Paid Training</DialogTitle></DialogHeader>
+              <DialogHeader><DialogTitle>Add to Paid Training</DialogTitle><DialogDescription className="sr-only">Add member to paid training program</DialogDescription></DialogHeader>
               <div className="space-y-4">
                 <div>
                   <Label>Select Member</Label>

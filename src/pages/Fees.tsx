@@ -26,7 +26,7 @@ import { Badge } from '@/components/ui/badge';
 import { useToast } from '@/hooks/use-toast';
 import { Receipt, Plus, ChevronLeft, ChevronRight, MessageCircle, RefreshCw, RotateCcw, Printer } from 'lucide-react';
 import { format, addMonths, subMonths, startOfMonth, isBefore, startOfDay } from 'date-fns';
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '@/components/ui/dialog';
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogFooter } from '@/components/ui/dialog';
 import { printReceipt } from '@/components/PrintReceipt';
 import { useGymOwnerId } from '@/hooks/useGymOwnerId';
 
@@ -829,6 +829,9 @@ export default function Fees() {
         <DialogContent className="border-border/50 bg-card/95 shadow-lg backdrop-blur-xl sm:max-w-md">
           <DialogHeader>
             <DialogTitle>Collect Payment</DialogTitle>
+            <DialogDescription className="sr-only">
+              Record payment method and mark fee as paid
+            </DialogDescription>
           </DialogHeader>
           {payingFee && (
             <div className="space-y-4">

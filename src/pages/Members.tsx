@@ -10,6 +10,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import {
   Dialog,
   DialogContent,
+  DialogDescription,
   DialogHeader,
   DialogTitle,
   DialogTrigger,
@@ -99,19 +100,45 @@ export default function Members() {
           .order('full_name'),
         supabase
           .from('monthly_fees')
-          .select('member_id, status')
+          .select('member_id, status, month')
           .eq('user_id', gymOwnerId!)
-          .eq('month', currentMonth),
+          .order('month', { ascending: false }),
       ]);
 
       if (membersRes.error) throw membersRes.error;
       setMembers(membersRes.data || []);
 
-      // Build fee status map for current month
-      const statusMap: Record<string, 'Paid' | 'Pending'> = {};
-      (feesRes.data || []).forEach((f) => {
-        statusMap[f.member_id] = f.status as 'Paid' | 'Pending';
+      // Build fee status map with fallback logic
+      const statusMap: Record<string, 'Paid' | 'Pending' | null> = {};
+      const allFees = feesRes.data || [];
+      
+      // Group fees by member_id
+      const feesByMember: Record<string, Array<{member_id: string; status: string; month: string}>> = {};
+      allFees.forEach((f) => {
+        if (!feesByMember[f.member_id]) {
+          feesByMember[f.member_id] = [];
+        }
+        feesByMember[f.member_id].push(f);
       });
+
+      // For each member, determine fee status
+      membersRes.data?.forEach((member) => {
+        const memberFees = feesByMember[member.id] || [];
+        
+        // First check if there's a current month entry
+        const currentMonthFee = memberFees.find(f => f.month === currentMonth);
+        if (currentMonthFee) {
+          statusMap[member.id] = currentMonthFee.status as 'Paid' | 'Pending';
+        } else if (memberFees.length > 0) {
+          // If no current month entry, use the most recent fee status
+          const mostRecentFee = memberFees[0]; // Already ordered by month descending
+          statusMap[member.id] = mostRecentFee.status as 'Paid' | 'Pending';
+        } else {
+          // No fee entries at all
+          statusMap[member.id] = null;
+        }
+      });
+
       setFeeStatusMap(statusMap);
     } catch (error) {
       console.error('Error fetching members:', error);
@@ -192,7 +219,7 @@ export default function Members() {
         await logActivity({ action_type: 'member_updated', description: `Updated member ${formData.full_name.trim()}`, entity_type: 'member', entity_id: editingMember.id });
         toast({ title: 'Success', description: 'Member updated successfully' });
       } else {
-        const { error } = await supabase.from('members').insert({
+        const { data: newMember, error } = await supabase.from('members').upsert({
           user_id: gymOwnerId!,
           full_name: formData.full_name.trim(),
           phone: formData.phone.trim() || null,
@@ -200,10 +227,29 @@ export default function Members() {
           monthly_fee: parseFloat(formData.monthly_fee),
           admission_fee: parseFloat(formData.admission_fee) || 0,
           admission_fee_paid: false,
-        });
+        }, {
+          onConflict: 'user_id,phone'
+        })
+        .select()
+        .single();
 
         if (error) throw error;
-        await logActivity({ action_type: 'member_added', description: `Added member ${formData.full_name.trim()}`, entity_type: 'member' });
+        
+        // Insert monthly fee record for the new member
+        const { error: feeError } = await supabase.from('monthly_fees').insert({
+          user_id: gymOwnerId!,
+          member_id: newMember.id,
+          month: format(new Date(), 'yyyy-MM'),
+          amount: parseFloat(formData.monthly_fee),
+          status: 'Pending'
+        });
+
+        if (feeError) {
+          console.error('Error creating monthly fee record:', feeError);
+          // Don't throw error for fee record creation - member was created successfully
+        }
+        
+        await logActivity({ action_type: 'member_added', description: `Added member ${formData.full_name.trim()}`, entity_type: 'member', entity_id: newMember.id });
         toast({ title: 'Success', description: 'Member added successfully' });
       }
 
@@ -336,6 +382,9 @@ export default function Members() {
                 <DialogTitle>
                   {editingMember ? 'Edit Member' : 'Add New Member'}
                 </DialogTitle>
+                <DialogDescription className="sr-only">
+                  {editingMember ? 'Edit existing member information' : 'Add a new member to the gym'}
+                </DialogDescription>
               </DialogHeader>
               <form onSubmit={handleSubmit} className="space-y-4">
                 <div className="space-y-2">

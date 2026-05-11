@@ -8,7 +8,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Badge } from '@/components/ui/badge';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from '@/components/ui/alert-dialog';
 import { UsersRound, UserPlus, Trash2, KeyRound, ShieldCheck } from 'lucide-react';
 import { toast } from 'sonner';
@@ -196,6 +196,9 @@ export default function TeamManagement() {
           <DialogContent className="border-border/50 bg-card/95 shadow-lg backdrop-blur-xl sm:max-w-lg">
             <DialogHeader>
               <DialogTitle>Create Team User</DialogTitle>
+              <DialogDescription className="sr-only">
+                Create a new team user account with limited access
+              </DialogDescription>
             </DialogHeader>
             <div className="space-y-3">
               <div>
@@ -312,7 +315,12 @@ export default function TeamManagement() {
         {/* Reset Password Dialog */}
         <Dialog open={!!resetUserId} onOpenChange={(o) => !o && setResetUserId(null)}>
           <DialogContent className="border-border/50 bg-card/95 shadow-lg backdrop-blur-xl sm:max-w-md">
-            <DialogHeader><DialogTitle>Reset Password</DialogTitle></DialogHeader>
+            <DialogHeader>
+              <DialogTitle>Reset Password</DialogTitle>
+              <DialogDescription className="sr-only">
+                Set a new temporary password for team member
+              </DialogDescription>
+            </DialogHeader>
             <div className="space-y-3">
               <div>
                 <Label>New Password</Label>

@@ -7,7 +7,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Badge } from '@/components/ui/badge';
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Dumbbell, Edit, Trash2, Heart } from 'lucide-react';
 import { toast } from 'sonner';
 
@@ -163,6 +163,9 @@ export default function WorkoutPlanCard({ paidTrainingMemberId }: Props) {
           <DialogContent className="max-w-md">
             <DialogHeader>
               <DialogTitle>{editDay} Workout</DialogTitle>
+              <DialogDescription className="sr-only">
+                Plan workout exercises for {editDay}
+              </DialogDescription>
             </DialogHeader>
             <div className="space-y-4">
               <div>
