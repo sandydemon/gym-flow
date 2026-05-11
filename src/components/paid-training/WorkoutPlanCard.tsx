@@ -43,7 +43,7 @@ export default function WorkoutPlanCard({ paidTrainingMemberId }: Props) {
       const { data, error } = await supabase
         .from('workout_plans')
         .select('*')
-        .eq('paid_training_member_id', paidTrainingMemberId);
+        .eq('member_id', paidTrainingMemberId);
       if (error) throw error;
       return data as Plan[];
     },
@@ -57,7 +57,7 @@ export default function WorkoutPlanCard({ paidTrainingMemberId }: Props) {
       if (!editDay) return;
       const existing = planByDay(editDay);
       const payload: any = {
-        paid_training_member_id: paidTrainingMemberId,
+        member_id: paidTrainingMemberId,
         user_id: gymOwnerId!,
         day_of_week: editDay,
         body_parts: form.body_parts,
