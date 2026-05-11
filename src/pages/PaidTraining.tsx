@@ -622,7 +622,7 @@ export default function PaidTraining() {
             </Card>
           </div>
 
-          <WorkoutPlanCard paidTrainingMemberId={selectedMemberId!} />
+          <WorkoutPlanCard paidTrainingMemberId={(selectedPaidMember as any).member_id} />
 
           <Card>
             <CardHeader>
