@@ -219,39 +219,42 @@ export default function Members() {
         await logActivity({ action_type: 'member_updated', description: `Updated member ${formData.full_name.trim()}`, entity_type: 'member', entity_id: editingMember.id });
         toast({ title: 'Success', description: 'Member updated successfully' });
       } else {
-        const { data: newMember, error } = await supabase.from('members').upsert({
-          user_id: gymOwnerId!,
-          full_name: formData.full_name.trim(),
-          phone: formData.phone.trim() || null,
-          join_date: formData.join_date,
-          monthly_fee: parseFloat(formData.monthly_fee),
-          admission_fee: parseFloat(formData.admission_fee) || 0,
-          admission_fee_paid: false,
-        }, {
-          onConflict: 'user_id,phone'
-        })
-        .select()
-        .single();
+  // Insert new member
+  const { data: newMember, error } = await supabase
+    .from('members')
+    .insert({
+      user_id: gymOwnerId!,
+      full_name: formData.full_name.trim(),
+      phone: formData.phone.trim() || null,
+      join_date: formData.join_date,
+      monthly_fee: parseFloat(formData.monthly_fee),
+      admission_fee: parseFloat(formData.admission_fee) || 0,
+      admission_fee_paid: false,
+    })
+    .select()
+    .single();
 
-        if (error) throw error;
-        
-        // Insert monthly fee record for the new member
-        const { error: feeError } = await supabase.from('monthly_fees').insert({
-          user_id: gymOwnerId!,
-          member_id: newMember.id,
-          month: format(new Date(), 'yyyy-MM'),
-          amount: parseFloat(formData.monthly_fee),
-          status: 'Pending'
-        });
+  if (error) throw error;
 
-        if (feeError) {
-          console.error('Error creating monthly fee record:', feeError);
-          // Don't throw error for fee record creation - member was created successfully
-        }
-        
-        await logActivity({ action_type: 'member_added', description: `Added member ${formData.full_name.trim()}`, entity_type: 'member', entity_id: newMember.id });
-        toast({ title: 'Success', description: 'Member added successfully' });
-      }
+  // Auto-create current month fee as Pending
+  if (newMember?.id) {
+    const currentMonth = format(new Date(), 'yyyy-MM');
+    await supabase.from('monthly_fees').insert({
+      user_id: gymOwnerId!,
+      member_id: newMember.id,
+      month: currentMonth,
+      amount: parseFloat(formData.monthly_fee),
+      status: 'Pending',
+    });
+  }
+
+  await logActivity({
+    action_type: 'member_added',
+    description: `Added member ${formData.full_name.trim()}`,
+    entity_type: 'member',
+  });
+  toast({ title: 'Success', description: 'Member added successfully' });
+}
 
       setDialogOpen(false);
       resetForm();
