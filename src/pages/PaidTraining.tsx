@@ -38,7 +38,6 @@ export default function PaidTraining() {
   const [editHeightForm, setEditHeightForm] = useState({ cm: '', ft: '', in: '' });
   const [editTrainerOpen, setEditTrainerOpen] = useState(false);
 
-  // Helpers: convert between cm and feet/inches
   const cmToFtIn = (cm: number | null | undefined) => {
     if (!cm) return { ft: '', in: '' };
     const totalInches = Number(cm) / 2.54;
@@ -61,7 +60,6 @@ export default function PaidTraining() {
   const [removeForm, setRemoveForm] = useState({ updateFee: false, newFee: '' });
   const [trainerFilter, setTrainerFilter] = useState<string>('all');
 
-  // Fetch gym name
   const { data: profile } = useQuery({
     queryKey: ['profile-gym-info', gymOwnerId],
     queryFn: async () => {
@@ -71,7 +69,6 @@ export default function PaidTraining() {
     enabled: !!gymOwnerId,
   });
 
-  // Fetch trainers (active staff with role 'Trainer')
   const { data: trainers = [] } = useQuery({
     queryKey: ['trainers', gymOwnerId],
     queryFn: async () => {
@@ -87,7 +84,6 @@ export default function PaidTraining() {
     enabled: !!gymOwnerId,
   });
 
-  // Fetch all existing members
   const { data: allMembers = [] } = useQuery({
     queryKey: ['all-members', gymOwnerId],
     queryFn: async () => {
@@ -103,7 +99,6 @@ export default function PaidTraining() {
     enabled: !!gymOwnerId,
   });
 
-  // Fetch paid training members
   const { data: paidMembers = [], isLoading } = useQuery({
     queryKey: ['paid-training-members', gymOwnerId],
     queryFn: async () => {
@@ -118,23 +113,18 @@ export default function PaidTraining() {
     enabled: !!gymOwnerId,
   });
 
-  // Get member IDs already in paid training
   const paidMemberIds = paidMembers.map((p: any) => p.member_id);
-
-  // Available members for adding (not already in paid training)
   const availableMembers = allMembers.filter((m) => !paidMemberIds.includes(m.id));
-
-  // Selected member's paid training data
   const selectedPaidMember = paidMembers.find((p: any) => p.id === selectedMemberId);
 
-  // Weight history for selected member
+  // Weight history - using member_id
   const { data: weightHistory = [] } = useQuery<any[]>({
     queryKey: ['weight-progress', selectedMemberId],
     queryFn: async () => {
       const { data, error } = await supabase
         .from('weight_progress')
         .select('*')
-        .eq('paid_training_member_id', selectedMemberId!)
+        .eq('member_id', selectedMemberId!)
         .order('recorded_at', { ascending: false });
       if (error) throw error;
       return data ?? [];
@@ -142,14 +132,14 @@ export default function PaidTraining() {
     enabled: !!selectedMemberId,
   });
 
-  // Photos for selected member
+  // Photos - using member_id
   const { data: photos = [] } = useQuery<any[]>({
     queryKey: ['progress-photos', selectedMemberId],
     queryFn: async () => {
       const { data, error } = await supabase
         .from('progress_photos')
         .select('*')
-        .eq('paid_training_member_id', selectedMemberId!)
+        .eq('member_id', selectedMemberId!)
         .order('created_at', { ascending: false });
       if (error) throw error;
       return data ?? [];
@@ -157,14 +147,14 @@ export default function PaidTraining() {
     enabled: !!selectedMemberId,
   });
 
-  // Body measurements for selected member
+  // Body measurements - using member_id
   const { data: measurements = [] } = useQuery<any[]>({
     queryKey: ['body-measurements', selectedMemberId],
     queryFn: async () => {
       const { data, error } = await supabase
         .from('body_measurements')
         .select('*')
-        .eq('paid_training_member_id', selectedMemberId!)
+        .eq('member_id', selectedMemberId!)
         .order('recorded_at', { ascending: false });
       if (error) throw error;
       return data ?? [];
@@ -172,7 +162,6 @@ export default function PaidTraining() {
     enabled: !!selectedMemberId,
   });
 
-  // Add body measurement
   const addMeasurement = useMutation({
     mutationFn: async () => {
       const entry: any = {
@@ -193,7 +182,6 @@ export default function PaidTraining() {
     onError: () => toast.error('Failed to save measurement'),
   });
 
-  // Delete measurement
   const deleteMeasurement = useMutation({
     mutationFn: async (id: string) => {
       const { error } = await supabase.from('body_measurements').delete().eq('id', id);
@@ -205,7 +193,7 @@ export default function PaidTraining() {
     },
     onError: () => toast.error('Failed to delete'),
   });
-  // Add member to paid training
+
   const addMember = useMutation({
     mutationFn: async () => {
       const { error } = await supabase.from('paid_training_members').insert({
@@ -217,7 +205,6 @@ export default function PaidTraining() {
       } as any);
       if (error) throw error;
 
-      // Update member's monthly fee if requested
       if (addForm.updateFee && addForm.newFee) {
         const { error: feeError } = await supabase
           .from('members')
@@ -236,10 +223,8 @@ export default function PaidTraining() {
     onError: () => toast.error('Failed to add member'),
   });
 
-  // Remove member from paid training
   const removeMember = useMutation({
     mutationFn: async ({ id, updateFee, newFee, memberId }: { id: string; updateFee: boolean; newFee: string; memberId: string }) => {
-      // Update fee first if requested
       if (updateFee && newFee) {
         const { error: feeError } = await supabase
           .from('members')
@@ -261,11 +246,11 @@ export default function PaidTraining() {
     onError: () => toast.error('Failed to remove'),
   });
 
-  // Add weight entry
+  // Add weight - using member_id
   const addWeight = useMutation({
     mutationFn: async () => {
       const { error } = await supabase.from('weight_progress').insert({
-        paid_training_member_id: selectedMemberId!,
+        member_id: selectedMemberId!,
         user_id: gymOwnerId!,
         weight: Number(newWeight),
       } as any);
@@ -279,7 +264,7 @@ export default function PaidTraining() {
     onError: () => toast.error('Failed to record weight'),
   });
 
-  // Upload photo
+  // Upload photo - using member_id
   const uploadPhoto = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file || !selectedMemberId) return;
@@ -297,7 +282,7 @@ export default function PaidTraining() {
       .getPublicUrl(filePath);
 
     const { error } = await supabase.from('progress_photos').insert({
-      paid_training_member_id: selectedMemberId,
+      member_id: selectedMemberId,
       user_id: gymOwnerId!,
       photo_url: urlData.publicUrl,
       label: photoLabel || null,
@@ -309,10 +294,8 @@ export default function PaidTraining() {
     toast.success('Photo uploaded');
   };
 
-  // Delete photo
   const deletePhoto = useMutation({
     mutationFn: async (photo: { id: string; photo_url: string }) => {
-      // Extract path from URL
       const url = new URL(photo.photo_url);
       const pathParts = url.pathname.split('/progress-photos/');
       if (pathParts[1]) {
@@ -328,7 +311,6 @@ export default function PaidTraining() {
     onError: () => toast.error('Failed to delete photo'),
   });
 
-  // Update paid training member (height/target)
   const updateMember = useMutation({
     mutationFn: async (updates: { height?: number | null; target?: string; trainer_id?: string | null }) => {
       const { error } = await supabase
@@ -343,7 +325,6 @@ export default function PaidTraining() {
     },
   });
 
-  // Generate Progress Report PDF
   const downloadProgressReport = async () => {
     if (!selectedPaidMember) return;
     const memberData = (selectedPaidMember as any).members;
@@ -352,7 +333,6 @@ export default function PaidTraining() {
     const doc = new jsPDF();
     const pageWidth = doc.internal.pageSize.getWidth();
 
-    // Load logo if available
     let logoImg: string | null = null;
     if (logoUrl) {
       try {
@@ -366,7 +346,6 @@ export default function PaidTraining() {
       } catch (e) { console.error('Failed to load logo', e); }
     }
 
-    // Header with gym name and logo
     doc.setFillColor(30, 30, 40);
     doc.rect(0, 0, pageWidth, 40, 'F');
     
@@ -386,7 +365,6 @@ export default function PaidTraining() {
     doc.setFontSize(9);
     doc.text(`Generated: ${format(new Date(), 'dd MMM yyyy')}`, textCenterX, 35, { align: 'center' });
 
-    // Client Info
     doc.setTextColor(0, 0, 0);
     let y = 52;
     doc.setFontSize(14);
@@ -410,7 +388,6 @@ export default function PaidTraining() {
       y += 7;
     });
 
-    // Weight Progress Table
     if (weightHistory.length > 0) {
       y += 6;
       doc.setFontSize(14);
@@ -431,7 +408,6 @@ export default function PaidTraining() {
       y = (doc as any).lastAutoTable.finalY + 10;
     }
 
-    // Body Measurements Table
     if (measurements.length > 0) {
       if (y > 240) { doc.addPage(); y = 20; }
       doc.setFontSize(14);
@@ -453,7 +429,6 @@ export default function PaidTraining() {
       });
     }
 
-    // Footer
     const pageCount = doc.getNumberOfPages();
     for (let i = 1; i <= pageCount; i++) {
       doc.setPage(i);
@@ -475,12 +450,10 @@ export default function PaidTraining() {
     const matchesTrainer =
       trainerFilter === 'all' ||
       (trainerFilter === 'unassigned' ? !p.trainer_id : p.trainer_id === trainerFilter);
-    // Trainers only see their own assigned members (or none if no staff link)
     const matchesScope = !isTrainerUser || (trainerStaffId && p.trainer_id === trainerStaffId);
     return matchesSearch && matchesTrainer && matchesScope;
   });
 
-  // Member profile view
   if (selectedMemberId && selectedPaidMember) {
     const memberData = (selectedPaidMember as any).members;
     return (
@@ -499,7 +472,6 @@ export default function PaidTraining() {
             </Button>
           </div>
 
-          {/* Info Cards */}
           <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
             <Card>
               <CardContent className="p-4 text-center">
@@ -609,9 +581,8 @@ export default function PaidTraining() {
                   {weightHistory.length > 0 ? `${(weightHistory[0] as any).weight} kg` : '—'}
                 </p>
               </CardContent>
-          </Card>
+            </Card>
 
-            {/* Trainer */}
             <Card>
               <CardContent className="p-4 text-center">
                 <UserCog className="h-5 w-5 mx-auto text-muted-foreground mb-1" />
@@ -651,10 +622,8 @@ export default function PaidTraining() {
             </Card>
           </div>
 
-          {/* Weekly Workout Plan */}
           <WorkoutPlanCard paidTrainingMemberId={selectedMemberId!} />
 
-          {/* Add Weight */}
           <Card>
             <CardHeader>
               <CardTitle className="text-base">Weight Progress</CardTitle>
@@ -675,7 +644,6 @@ export default function PaidTraining() {
                 </Button>
               </div>
 
-              {/* Weight Progress Ring */}
               <WeightProgressRing
                 weightHistory={weightHistory.map((w: any) => ({ weight: Number(w.weight), recorded_at: w.recorded_at }))}
                 target={(selectedPaidMember as any)?.target || 'General'}
@@ -698,7 +666,6 @@ export default function PaidTraining() {
             </CardContent>
           </Card>
 
-          {/* Body Measurements */}
           <Card>
             <CardHeader className="flex flex-row items-center justify-between">
               <CardTitle className="text-base flex items-center gap-2">
@@ -779,7 +746,6 @@ export default function PaidTraining() {
             </CardContent>
           </Card>
 
-          {/* Progress Photos */}
           <Card>
             <CardHeader>
               <CardTitle className="text-base">Progress Photos</CardTitle>
@@ -838,7 +804,6 @@ export default function PaidTraining() {
             </CardContent>
           </Card>
 
-          {/* Photo Lightbox */}
           {lightboxPhoto && (
             <Dialog open={!!lightboxPhoto} onOpenChange={() => setLightboxPhoto(null)}>
               <DialogContent className="max-w-3xl p-2">
@@ -855,7 +820,6 @@ export default function PaidTraining() {
             </Dialog>
           )}
 
-          {/* Remove Member */}
           <Dialog open={removeDialogOpen} onOpenChange={(open) => { setRemoveDialogOpen(open); if (!open) setRemoveForm({ updateFee: false, newFee: '' }); }}>
             <DialogTrigger asChild>
               <Button variant="destructive" size="sm">
@@ -922,7 +886,6 @@ export default function PaidTraining() {
     );
   }
 
-  // List view
   return (
     <Layout>
       <div className="space-y-6">
@@ -1007,7 +970,6 @@ export default function PaidTraining() {
                     <p className="text-xs text-muted-foreground mt-1">Add staff with role "Trainer" to assign one.</p>
                   )}
                 </div>
-                {/* Update Fee Option */}
                 {addForm.memberId && (() => {
                   const selected = allMembers.find(m => m.id === addForm.memberId);
                   return (
