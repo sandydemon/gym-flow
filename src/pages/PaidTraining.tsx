@@ -134,7 +134,7 @@ export default function PaidTraining() {
       const { data, error } = await supabase
         .from('weight_progress')
         .select('*')
-        .eq('member_id', selectedMemberId!)
+        .eq('member_id', (selectedPaidMember as any)?.member_id)
         .order('recorded_at', { ascending: false });
       if (error) throw error;
       return data;
