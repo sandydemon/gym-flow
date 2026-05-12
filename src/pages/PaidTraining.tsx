@@ -172,7 +172,13 @@ export default function PaidTraining() {
       const fields = ['chest', 'waist', 'hips', 'biceps', 'shoulders', 'thighs', 'calves', 'neck'] as const;
       fields.forEach(f => { if (measurementForm[f]) entry[f] = Number(measurementForm[f]); });
       const { error } = await supabase.from('body_measurements').insert(entry as any);
-      if (error) throw error;
+      if (error) {
+        if (error.code === '23505') {
+          toast.error('Measurement already recorded');
+          return;
+        }
+        throw error;
+      }
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['body-measurements', actualMemberId] });

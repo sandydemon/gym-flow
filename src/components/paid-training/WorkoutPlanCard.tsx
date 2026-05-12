@@ -64,10 +64,18 @@ export default function WorkoutPlanCard({ paidTrainingMemberId }: Props) {
         cardio: form.cardio === 'None' ? null : form.cardio,
         notes: form.notes || null,
       };
-      const { error } = await supabase
-  .from('workout_plans')
-  .upsert(payload as any, { onConflict: 'member_id,day_of_week' });
-if (error) throw error;
+      let error;
+      if (existing) {
+        ({ error } = await supabase
+          .from('workout_plans')
+          .update(payload as any)
+          .eq('id', existing.id));
+      } else {
+        ({ error } = await supabase
+          .from('workout_plans')
+          .insert(payload as any));
+      }
+      if (error) throw error;
     },
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: ['workout-plans', paidTrainingMemberId] });
