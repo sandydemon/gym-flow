@@ -247,11 +247,6 @@ export default function PaidTraining() {
           .eq('id', memberId);
         if (feeError) throw feeError;
       }
-      // Delete related records first to avoid FK errors
-      await supabase.from('body_measurements').delete().eq('member_id', id);
-      await supabase.from('workout_plans').delete().eq('member_id', id);
-      await supabase.from('weight_progress').delete().eq('member_id', id);
-      // Now delete the paid training member
       const { error } = await supabase.from('paid_training_members').delete().eq('id', id);
       if (error) throw error;
     },
@@ -716,7 +711,7 @@ export default function PaidTraining() {
                   </Button>
                 </DialogTrigger>
                 <DialogContent className="max-w-md">
-                  <DialogHeader><DialogTitle>Add Body Measurements (inches)</DialogTitle></DialogHeader>
+                  <DialogHeader><DialogTitle>Add Body Measurements (inches)</DialogTitle><DialogDescription className="sr-only">Record body measurements in inches</DialogDescription></DialogHeader>
                   <div className="grid grid-cols-2 gap-3">
                     {(['chest', 'waist', 'hips', 'biceps', 'shoulders', 'thighs', 'calves', 'neck'] as const).map(field => (
                       <div key={field}>
@@ -849,6 +844,7 @@ export default function PaidTraining() {
               <DialogContent className="max-w-3xl p-2">
                 <DialogHeader>
                   <DialogTitle className="text-sm">{lightboxPhoto.label}</DialogTitle>
+                  <DialogDescription className="sr-only">View progress photo</DialogDescription>
                 </DialogHeader>
                 <img
                   src={lightboxPhoto.url}
@@ -867,7 +863,7 @@ export default function PaidTraining() {
               </Button>
             </DialogTrigger>
             <DialogContent>
-              <DialogHeader><DialogTitle>Remove from Paid Training</DialogTitle></DialogHeader>
+              <DialogHeader><DialogTitle>Remove from Paid Training</DialogTitle><DialogDescription className="sr-only">Remove member from paid training program</DialogDescription></DialogHeader>
               <div className="space-y-4">
                 <p className="text-sm text-muted-foreground">
                   Kya aap <span className="font-semibold text-foreground">{memberData?.full_name}</span> ko paid training se remove karna chahte hain?
@@ -942,7 +938,7 @@ export default function PaidTraining() {
               </Button>
             </DialogTrigger>
             <DialogContent>
-              <DialogHeader><DialogTitle>Add to Paid Training</DialogTitle></DialogHeader>
+              <DialogHeader><DialogTitle>Add to Paid Training</DialogTitle><DialogDescription className="sr-only">Add a member to paid training program</DialogDescription></DialogHeader>
               <div className="space-y-4">
                 <div>
                   <Label>Select Member</Label>
