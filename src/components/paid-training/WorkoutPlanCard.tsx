@@ -55,6 +55,7 @@ export default function WorkoutPlanCard({ paidTrainingMemberId }: Props) {
   const savePlan = useMutation({
     mutationFn: async () => {
       if (!editDay) return;
+      console.log('saving for member:', paidTrainingMemberId, 'day:', editDay);
       const payload: any = {
         member_id: paidTrainingMemberId,
         user_id: gymOwnerId!,
