@@ -261,11 +261,10 @@ export default function PaidTraining() {
     onError: () => toast.error('Failed to remove'),
   });
 
-  // Add weight entry
   const addWeight = useMutation({
     mutationFn: async () => {
       const { error } = await supabase.from('weight_progress').insert({
-        member_id: selectedMemberId!,
+        member_id: (selectedPaidMember as any).member_id,
         user_id: gymOwnerId!,
         weight: Number(newWeight),
       });
