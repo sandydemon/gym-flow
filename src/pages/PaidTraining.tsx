@@ -150,23 +150,23 @@ export default function PaidTraining() {
 
   // Body measurements for selected member
   const { data: measurements = [] } = useQuery<any[]>({
-    queryKey: ['body-measurements', actualMemberId],
+    queryKey: ['body-measurements', selectedMemberId],
     queryFn: async () => {
       const { data, error } = await supabase
         .from('body_measurements')
         .select('*')
-        .eq('member_id', actualMemberId!)
+        .eq('member_id', selectedMemberId!)
         .order('recorded_at', { ascending: false });
       if (error) throw error;
       return data ?? [];
     },
-    enabled: !!actualMemberId,
+    enabled: !!selectedMemberId,
   });
 
   const addMeasurement = useMutation({
     mutationFn: async () => {
       const entry: any = {
-        member_id: actualMemberId!,
+        member_id: selectedMemberId!,
         user_id: gymOwnerId!,
       };
       const fields = ['chest', 'waist', 'hips', 'biceps', 'shoulders', 'thighs', 'calves', 'neck'] as const;
@@ -181,7 +181,7 @@ export default function PaidTraining() {
       }
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['body-measurements', actualMemberId] });
+      queryClient.invalidateQueries({ queryKey: ['body-measurements', selectedMemberId] });
       setMeasurementForm({ chest: '', waist: '', hips: '', biceps: '', shoulders: '', thighs: '', calves: '', neck: '' });
       setAddMeasurementOpen(false);
       toast.success('Measurement recorded');
@@ -195,7 +195,7 @@ export default function PaidTraining() {
       if (error) throw error;
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['body-measurements', actualMemberId] });
+      queryClient.invalidateQueries({ queryKey: ['body-measurements', selectedMemberId] });
       toast.success('Measurement deleted');
     },
     onError: () => toast.error('Failed to delete'),
