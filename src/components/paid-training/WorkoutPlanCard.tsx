@@ -55,7 +55,6 @@ export default function WorkoutPlanCard({ paidTrainingMemberId }: Props) {
   const savePlan = useMutation({
     mutationFn: async () => {
       if (!editDay) return;
-      const existing = planByDay(editDay);
       const payload: any = {
         member_id: paidTrainingMemberId,
         user_id: gymOwnerId!,
@@ -64,18 +63,26 @@ export default function WorkoutPlanCard({ paidTrainingMemberId }: Props) {
         cardio: form.cardio === 'None' ? null : form.cardio,
         notes: form.notes || null,
       };
-      let error;
-      if (existing) {
-        ({ error } = await supabase
+      
+      const existing = await supabase
+        .from('workout_plans')
+        .select('id')
+        .eq('member_id', paidTrainingMemberId)
+        .eq('day_of_week', editDay)
+        .maybeSingle();
+
+      if (existing.data?.id) {
+        const { error } = await supabase
           .from('workout_plans')
-          .update(payload as any)
-          .eq('id', existing.id));
+          .update(payload)
+          .eq('id', existing.data.id);
+        if (error) throw error;
       } else {
-        ({ error } = await supabase
+        const { error } = await supabase
           .from('workout_plans')
-          .insert(payload as any));
+          .insert(payload);
+        if (error) throw error;
       }
-      if (error) throw error;
     },
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: ['workout-plans', paidTrainingMemberId] });
