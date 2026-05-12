@@ -232,6 +232,7 @@ export default function PaidTraining() {
 
   const removeMember = useMutation({
     mutationFn: async ({ id, updateFee, newFee, memberId }: { id: string; updateFee: boolean; newFee: string; memberId: string }) => {
+      // Update fee first if requested
       if (updateFee && newFee) {
         const { error: feeError } = await supabase
           .from('members')
@@ -239,6 +240,13 @@ export default function PaidTraining() {
           .eq('id', memberId);
         if (feeError) throw feeError;
       }
+
+      // Delete related records first
+      await supabase.from('body_measurements').delete().eq('member_id', id);
+      await supabase.from('workout_plans').delete().eq('paid_training_member_id', id);
+      await supabase.from('weight_progress').delete().eq('paid_training_member_id', id);
+
+      // Now delete the paid training member
       const { error } = await supabase.from('paid_training_members').delete().eq('id', id);
       if (error) throw error;
     },
