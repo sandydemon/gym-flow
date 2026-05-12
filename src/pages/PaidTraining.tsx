@@ -149,7 +149,7 @@ export default function PaidTraining() {
       const { data, error } = await supabase
         .from('progress_photos')
         .select('*')
-        .eq('member_id', selectedMemberId!)
+        .eq('member_id', (selectedPaidMember as any)?.member_id)
         .order('uploaded_at', { ascending: false });
       if (error) throw error;
       return data;
