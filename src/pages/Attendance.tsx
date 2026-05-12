@@ -29,7 +29,6 @@ export default function Attendance() {
   const [search, setSearch] = useState('');
   const today = format(new Date(), 'yyyy-MM-dd');
 
-  // Fetch gym name for reminder message
   const { data: profile } = useQuery({
     queryKey: ['profile', gymOwnerId],
     queryFn: async () => {
@@ -72,7 +71,6 @@ export default function Attendance() {
     enabled: !!gymOwnerId,
   });
 
-  // Fetch inactive members
   const { data: inactiveMembers = [] } = useQuery({
     queryKey: ['inactive-members', gymOwnerId],
     queryFn: async () => {
@@ -119,7 +117,6 @@ export default function Attendance() {
     enabled: !!gymOwnerId,
   });
 
-  // Fetch today's reminder logs
   const { data: todayReminders = [] } = useQuery({
     queryKey: ['reminder-logs-today', gymOwnerId, today],
     queryFn: async () => {
@@ -204,14 +201,23 @@ export default function Attendance() {
   const filtered = members.filter(
     (m) =>
       m.full_name.toLowerCase().includes(search.toLowerCase()) ||
-      (m.phone && m.phone.includes(search))
+      (m.phone && m.phone.includes(search)) ||
+      (m.member_code && m.member_code.toLowerCase().includes(search.toLowerCase()))
   );
+
+  // Sort: present members at top
+  const sorted = [...filtered].sort((a, b) => {
+    const aPresent = todayAttendance.includes(a.id) ? 1 : 0;
+    const bPresent = todayAttendance.includes(b.id) ? 1 : 0;
+    return bPresent - aPresent;
+  });
 
   const presentCount = todayAttendance.length;
 
   return (
     <Layout>
       <div className="space-y-6">
+        {/* Header */}
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
           <div>
             <h1 className="text-2xl font-bold text-foreground">Attendance</h1>
@@ -219,43 +225,94 @@ export default function Attendance() {
               {format(new Date(), 'EEEE, MMMM d, yyyy')}
             </p>
           </div>
-          <Badge variant="secondary" className="text-sm w-fit">
-            <UserCheck className="h-4 w-4 mr-1" />
-            {presentCount} Present Today
-          </Badge>
+          <div className="flex items-center gap-3">
+            <Badge variant="secondary" className="text-sm px-3 py-1.5">
+              <UserCheck className="h-4 w-4 mr-1.5" />
+              {presentCount} Present Today
+            </Badge>
+            <Badge variant="outline" className="text-sm px-3 py-1.5">
+              {members.length} Total
+            </Badge>
+          </div>
         </div>
 
+        {/* Progress bar */}
+        {members.length > 0 && (
+          <div className="space-y-1.5">
+            <div className="flex justify-between text-xs text-muted-foreground">
+              <span>Today's attendance</span>
+              <span>{Math.round((presentCount / members.length) * 100)}%</span>
+            </div>
+            <div className="h-2 bg-muted rounded-full overflow-hidden">
+              <div
+                className="h-full bg-green-500 rounded-full transition-all duration-500"
+                style={{ width: `${(presentCount / members.length) * 100}%` }}
+              />
+            </div>
+          </div>
+        )}
+
+        {/* Search */}
         <div className="relative">
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
           <Input
-            placeholder="Search by name or phone..."
+            placeholder="Search by name, phone or member ID..."
             value={search}
             onChange={(e) => setSearch(e.target.value)}
             className="pl-10"
           />
         </div>
 
+        {/* Members List */}
         {isLoading ? (
           <p className="text-muted-foreground text-center py-8">Loading members...</p>
-        ) : filtered.length === 0 ? (
+        ) : sorted.length === 0 ? (
           <p className="text-muted-foreground text-center py-8">
             {search ? 'No members found' : 'No active members'}
           </p>
         ) : (
-          <div className="grid gap-3">
-            {filtered.map((member) => {
+          <div className="grid gap-2">
+            {sorted.map((member) => {
               const isPresent = todayAttendance.includes(member.id);
               return (
-                <Card key={member.id} className={isPresent ? 'border-green-500/30 bg-green-500/5' : ''}>
+                <Card
+                  key={member.id}
+                  className={isPresent
+                    ? 'border-green-500/40 bg-green-500/5'
+                    : 'hover:border-primary/30 transition-colors'
+                  }
+                >
                   <CardContent className="flex items-center justify-between p-4">
-                    <div>
-                      <p className="font-medium text-foreground">{member.full_name}</p>
-                      {member.phone && (
-                        <p className="text-sm text-muted-foreground">{member.phone}</p>
-                      )}
+                    <div className="flex items-center gap-3">
+                      {/* Avatar */}
+                      <div className={`w-10 h-10 rounded-full flex items-center justify-center text-sm font-bold shrink-0 ${
+                        isPresent
+                          ? 'bg-green-500/20 text-green-500'
+                          : 'bg-muted text-muted-foreground'
+                      }`}>
+                        {member.full_name.charAt(0).toUpperCase()}
+                      </div>
+                      <div>
+                        <div className="flex items-center gap-2 flex-wrap">
+                          <p className="font-medium text-foreground">{member.full_name}</p>
+                          {member.member_code && (
+                            <Badge
+                              variant="outline"
+                              className="text-[10px] px-1.5 py-0 font-mono text-primary border-primary/30"
+                            >
+                              {member.member_code}
+                            </Badge>
+                          )}
+                        </div>
+                        {member.phone && (
+                          <p className="text-sm text-muted-foreground">{member.phone}</p>
+                        )}
+                      </div>
                     </div>
+
+                    {/* Action */}
                     {isPresent ? (
-                      <div className="flex items-center gap-2">
+                      <div className="flex items-center gap-2 shrink-0">
                         <Badge className="bg-green-600 hover:bg-green-600 text-white">
                           <CheckCircle2 className="h-3.5 w-3.5 mr-1" />
                           Present
@@ -263,9 +320,10 @@ export default function Attendance() {
                         <Button
                           size="sm"
                           variant="ghost"
-                          className="text-destructive hover:text-destructive hover:bg-destructive/10"
+                          className="text-destructive hover:text-destructive hover:bg-destructive/10 h-8 w-8 p-0"
                           onClick={() => removeAttendance.mutate(member.id)}
                           disabled={removeAttendance.isPending}
+                          title="Undo attendance"
                         >
                           <Undo2 className="h-4 w-4" />
                         </Button>
@@ -273,10 +331,12 @@ export default function Attendance() {
                     ) : (
                       <Button
                         size="sm"
+                        className="shrink-0"
                         onClick={() => markAttendance.mutate(member.id)}
                         disabled={markAttendance.isPending}
                       >
-                        Mark Attendance
+                        <CheckCircle className="h-4 w-4 mr-1" />
+                        Mark
                       </Button>
                     )}
                   </CardContent>
