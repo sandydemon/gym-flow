@@ -278,13 +278,15 @@ export default function PaidTraining() {
     onError: () => toast.error('Failed to record weight'),
   });
 
-  // Upload photo
-  const uploadPhoto = async (e: React.ChangeEvent<HTMLInputElement>) => {
+ const uploadPhoto = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file || !selectedMemberId) return;
 
+    const actualMemberId = (selectedPaidMember as any)?.member_id;
+    if (!actualMemberId) return;
+
     const ext = file.name.split('.').pop();
-    const filePath = `${user!.id}/${selectedMemberId}/${Date.now()}.${ext}`;
+    const filePath = `${user!.id}/${actualMemberId}/${Date.now()}.${ext}`;
 
     const { error: uploadError } = await supabase.storage
       .from('progress-photos')
@@ -296,7 +298,7 @@ export default function PaidTraining() {
       .getPublicUrl(filePath);
 
     const { error } = await supabase.from('progress_photos').insert({
-      member_id: selectedMemberId,
+      member_id: actualMemberId,
       user_id: gymOwnerId!,
       photo_url: urlData.publicUrl,
       label: photoLabel || null,
