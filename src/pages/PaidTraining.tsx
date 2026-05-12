@@ -242,9 +242,9 @@ export default function PaidTraining() {
       }
 
       // Delete related records first
-      await supabase.from('body_measurements').delete().eq('member_id', id);
-      await supabase.from('workout_plans').delete().eq('paid_training_member_id', id);
-      await supabase.from('weight_progress').delete().eq('paid_training_member_id', id);
+      await supabase.from('body_measurements').delete().eq('member_id', id) as any;
+      await supabase.from('workout_plans').delete().eq('member_id', id) as any;
+      await supabase.from('weight_progress').delete().eq('member_id', id) as any;
 
       // Now delete the paid training member
       const { error } = await supabase.from('paid_training_members').delete().eq('id', id);
