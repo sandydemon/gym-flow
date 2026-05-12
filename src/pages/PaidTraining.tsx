@@ -652,7 +652,7 @@ export default function PaidTraining() {
           </div>
 
           {/* Weekly Workout Plan */}
-          <WorkoutPlanCard paidTrainingMemberId={selectedMemberId!} />
+          <WorkoutPlanCard paidTrainingMemberId={(selectedPaidMember as any).member_id} />
 
           {/* Add Weight */}
           <Card>
