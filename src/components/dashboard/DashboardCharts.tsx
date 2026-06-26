@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/useAuth';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { format, subMonths } from 'date-fns';
+import { format, subMonths, endOfMonth } from 'date-fns';
 import {
   PieChart, Pie, Cell, ResponsiveContainer, Tooltip,
   BarChart, Bar, XAxis, YAxis, CartesianGrid,
@@ -68,7 +68,7 @@ export default function DashboardCharts() {
       .select('category, amount')
       .eq('user_id', user!.id)
       .gte('expense_date', currentMonth + '-01')
-      .lte('expense_date', currentMonth + '-31');
+      .lte('expense_date', format(endOfMonth(now), 'yyyy-MM-dd'));
 
     const expMap = new Map<string, number>();
     expenses?.forEach(e => expMap.set(e.category, (expMap.get(e.category) || 0) + Number(e.amount)));
