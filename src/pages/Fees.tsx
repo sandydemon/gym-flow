@@ -161,11 +161,7 @@ export default function Fees() {
   };
 
   // Check if the selected month is in the future (beyond current month)
-  const isFutureMonth = (() => {
-    const selected = new Date(selectedMonth + '-01');
-    const currentMonth = startOfMonth(new Date());
-    return selected > currentMonth;
-  })();
+  const isFutureMonth = false;
 
   const generateMonthlyFees = async () => {
     if (isFutureMonth) {
